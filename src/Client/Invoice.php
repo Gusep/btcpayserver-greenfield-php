@@ -257,4 +257,59 @@ class Invoice extends AbstractClient
             throw $this->getExceptionByStatusCode($method, $url, $response);
         }
     }
+
+    /**
+     * Archive invoice.
+     *
+     * @see https://docs.btcpayserver.org/API/Greenfield/v1/#operation/Invoices_ArchiveInvoice
+     * @throws \JsonException
+     */
+    public function archiveInvoice(
+        string $storeId,
+        string $invoiceId,
+    ): bool
+    {
+        $url = $this->getApiUrl() . 'stores/' . urlencode(
+                $storeId
+            ) . '/invoices/' . urlencode($invoiceId);
+        $headers = $this->getRequestHeaders();
+        $method = 'DELETE';
+
+        $response = $this->getHttpClient()->request($method, $url, $headers);
+
+        if ($response->getStatus() === 200) {
+            return true;
+        } else {
+            throw $this->getExceptionByStatusCode($method, $url, $response);
+        }
+    }
+
+
+    /**
+     * Unarchive invoice.
+     *
+     * @see https://docs.btcpayserver.org/API/Greenfield/v1/#operation/Invoices_UnarchiveInvoice
+     * @throws \JsonException
+     */
+    public function unarchiveInvoice(
+        string $storeId,
+        string $invoiceId,
+    ): ResultInvoice {
+        $url = $this->getApiUrl() . 'stores/' . urlencode(
+                $storeId
+            ) . '/invoices/' . urlencode($invoiceId) . '/unarchive';
+        $headers = $this->getRequestHeaders();
+        $method = 'POST';
+
+        $response = $this->getHttpClient()->request($method, $url, $headers);
+
+        if ($response->getStatus() === 200) {
+            return new ResultInvoice(
+                json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR)
+            );
+        } else {
+            throw $this->getExceptionByStatusCode($method, $url, $response);
+        }
+
+    }
 }
